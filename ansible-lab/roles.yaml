@@ -1,0 +1,80 @@
+---
+- name: System Pre-Tasks (Updates)
+  hosts: all
+  become: true
+  pre_tasks:
+
+    - name: install updates (CentOS)
+      tags: always
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates (Ubuntu)
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- name: Configure Web Servers
+  hosts: web_servers
+  become: true
+  tasks:
+
+    - name: install apache and php for Ubuntu servers
+      tags: [apache, apache2, ubuntu, web]
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install apache and php for CentOS servers
+      tags: [apache, centos, httpd, web]
+      dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+- name: Configure Database Servers
+  hosts: db_servers
+  become: true
+  tasks:
+
+    - name: install mariadb package (CentOS)
+      tags: [centos, db, mariadb]
+      dnf:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: MariaDB - Restarting / Enabling
+      tags: [db, mariadb]
+      service:
+        name: mariadb
+        state: restarted
+        enabled: true
+
+    - name: install mariadb package (Ubuntu)
+      tags: [db, mariadb, ubuntu]
+      apt: 
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+- name: Configure File Servers
+  hosts: file_servers
+  become: true
+  tasks:
+    - name: install samba package
+      tags: [samba, file]
+      package:
+        name: samba
+        state: latest
+

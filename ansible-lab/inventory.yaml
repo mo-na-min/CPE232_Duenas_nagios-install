@@ -1,0 +1,56 @@
+all:
+  children:
+    ubuntu:
+      vars:
+        apache_package: apache2
+        php_package: libapache2-mod-php
+      hosts:
+        ubuntu1:
+          ansible_host: 192.168.56.104
+          ansible_user: ubuntu1
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa
+          ansible_password: "123"
+          os_type: Ubuntu
+
+          # update here
+          apache_package: apache2
+          php_package: libapache2-mod-php
+
+        ubuntu2:
+          ansible_host: 192.168.56.105
+          ansible_user: ubuntu2
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa
+          ansible_password: "123"
+          os_type: Ubuntu
+
+          # update here
+          apache_package: apache2
+          php_package: libapache2-mod-php
+
+    centos:
+      vars:
+        apache_package: httpd
+        php_package: php
+      hosts:
+        centos1:
+          ansible_host: 192.168.56.108
+          ansible_user: centos1
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa
+          ansible_password: "123"
+          os_type: Centos
+
+          # update here
+          apache_package: httpd
+          php_package: php
+
+    web_servers:
+      children:
+        ubuntu:
+
+    db_servers:
+      children:
+        centos:
+
+    workstations:
+      hosts:
+        ubuntu1:
